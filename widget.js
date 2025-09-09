@@ -2,7 +2,7 @@
     const restaurant = document.currentScript.getAttribute("data-restaurant");
     console.log("Widget loaded for:", restaurant);
   
-    fetch(`http://localhost:4000/api/promotions?restaurant=${restaurant}`)
+    fetch(`https://zyra-api.onrender.com//api/promotions?restaurant=${restaurant}`)
       .then((res) => res.json())
       .then((promo) => {
         console.log("Promo fetched:", promo);
