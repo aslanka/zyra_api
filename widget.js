@@ -57,7 +57,7 @@
   
           // ===== Image section =====
           const img = document.createElement("img");
-          img.src = promo.image || "https://www.allrecipes.com/thmb/fFW1o307WSqFFYQ3-QXYVpnFj6E=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/48727-Mikes-homemade-pizza-DDMFS-beauty-4x3-BG-2974-a7a9842c14e34ca699f3b7d7143256cf.jpg";
+          img.src = promo.image || "https://static.toiimg.com/thumb/msid-89540777,width-400,resizemode-4/89540777.jpg";
           img.alt = promo.title;
           img.style.width = "100%";
           img.style.height = "240px";

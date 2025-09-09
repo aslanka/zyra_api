@@ -10,8 +10,8 @@ app.use(express.static(__dirname)); // ✅ serves widget.js
 const promotions = {
   "pizza-palace": {
     active: true,
-    title: "🍕 2-for-1 Pizzas!",
-    description: "Every Tuesday, buy one pizza and get one free!",
+    title: "Valentine's Day",
+    description: "Buy one meal, get one free",
     start: "2025-09-01",
     end: "2025-09-30",
   },
