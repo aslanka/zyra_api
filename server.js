@@ -12,26 +12,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-
-// ====== Postgres Setup ======
-// const pool = new Pool({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "promotions_db",
-//   password: "password",
-//   port: 5432,
-// });
-
-// const pool = new Pool({
-//   connectionString: "postgres://postgres:postgres@localhost:5432/promotions_db"
-// });
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }, // Required for Render
 });
+
 // ====== Middleware to Protect Routes ======
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
