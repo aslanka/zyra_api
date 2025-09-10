@@ -3,10 +3,12 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
+const { Resend } = require("resend");
 
 const app = express();
 const PORT = 4000;
 const SECRET = "supersecretjwt"; // put in .env
+const resend = new Resend(process.env.RESEND_API_KEY); 
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +18,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }, // Required for Render
 });
+
 
 // ====== Middleware to Protect Routes ======
 const authMiddleware = (req, res, next) => {
@@ -135,6 +138,60 @@ app.get("/api/promotions/me", authMiddleware, async (req, res) => {
   if (promo.rows.length === 0) return res.json({ active: false });
   res.json(promo.rows[0]);
 });
+
+// ===== Lead Capture Route =====
+app.post("/api/leads", async (req, res) => {
+  const { restaurantName, contactName, email, phone, website } = req.body;
+
+  try {
+    // Save lead in DB (optional table)
+    // await pool.query(
+    //   `INSERT INTO leads (restaurant_name, contact_name, email, phone, website, created_at)
+    //    VALUES ($1,$2,$3,$4,$5,NOW())`,
+    //   [restaurantName, contactName, email, phone, website]
+    // );
+
+    // Send confirmation email to user
+    await resend.emails.send({
+      from: "Lytebaux <team@lytebaux.com>",
+      to: email,
+      subject: "Thanks for Signing Up with Lytebaux",
+      html: `
+        <p>Hi <b>${contactName}</b>,</p>
+        <p>Thanks for reaching out to <b>Lytebaux</b>!</p>
+        <p>Next steps:</p>
+        <ul>
+          <li>We’ll contact you shortly to schedule a quick onboarding call.</li>
+          <li>You’ll get access to your admin dashboard.</li>
+          <li>From there, you can start creating promotions instantly.</li>
+        </ul>
+        <p>– The Lytebaux Team 💜</p>
+      `,
+    });
+
+    // Notify internal admin email
+    // await resend.emails.send({
+    //   from: "Lytebaux <noreply@lytebaux.com>",
+    //   to: process.env.ADMIN_EMAIL,
+    //   subject: "📩 New Lead Captured",
+    //   html: `
+    //     <h3>New Lead</h3>
+    //     <p><b>Business:</b> ${restaurantName}</p>
+    //     <p><b>Contact:</b> ${contactName}</p>
+    //     <p><b>Email:</b> ${email}</p>
+    //     <p><b>Phone:</b> ${phone || "N/A"}</p>
+    //     <p><b>Website:</b> ${website || "N/A"}</p>
+    //   `,
+    // });
+
+    res.json({ success: true, message: "Lead captured and confirmation email sent." });
+  } catch (err) {
+    console.error("Lead error:", err);
+    res.status(500).json({ error: "Failed to capture lead." });
+  }
+});
+
+
 
 
 app.listen(PORT, () => console.log(`✅ API running at http://localhost:${PORT}`));
