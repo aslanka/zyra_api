@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:15
+    container_name: promotions-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: promotions_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  api:
+    build: .
+    container_name: promotions-api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: promotions_db
+      DB_HOST: db
+      DB_PORT: 5432
+      JWT_SECRET: supersecretjwt
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: node server.js
+
+volumes:
+  db_data:
